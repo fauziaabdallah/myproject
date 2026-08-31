@@ -78,7 +78,6 @@
                             <select name="role" class="form-control">
                                 @if(Auth::guard('web')->user()->role=="accountant")
                                 <option value="">Select Role</option>
-                                <option value="manager">Manager</option>
                                 <option value="driver">Driver</option>
 
                                 @else
@@ -143,10 +142,10 @@
             <tr>
                 <th>#</th>
                 <th>Name</th>
-                <th>Mobile</th>
                 <th>Email</th>
+                <th>Mobile</th>
                 <th>Role</th>
-                <th>Organization</th>
+            
                 <th width="100">Action</th>
             </tr>
         </thead>
@@ -160,9 +159,10 @@
                         {{ $user->first_name }} {{ $user->last_name }}
                     </td>
 
-                    <td>{{ $user->mobile }}</td>
 
                     <td>{{ $user->email }}</td>
+                    <td>{{ $user->mobile }}</td>
+
 
                     <td>
                         <span class="badge bg-info text-dark">
@@ -170,9 +170,7 @@
                         </span>
                     </td>
 
-                    <td>
-                        {{ $user->organization->company_name ?? 'N/A' }}
-                    </td>
+                  
 
                     <td>
                         <!-- EDIT BUTTON -->
@@ -287,10 +285,7 @@
                                                     Admin
                                                 </option>
 
-                                                <option value="manager"
-                                                    {{ $user->role == 'manager' ? 'selected' : '' }}>
-                                                    Manager
-                                                </option>
+                                               
 
                                                 <option value="driver"
                                                     {{ $user->role == 'driver' ? 'selected' : '' }}>

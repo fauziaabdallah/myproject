@@ -61,8 +61,21 @@
 
                     <div class="row">
                         <div class="col-md-6 mb-2">
-                            <input type="text" name="mobile" class="form-control" maxlength="10" placeholder="Mobile" required>
-                        </div>
+    <input
+        type="text"
+        name="mobile"
+        class="form-control"
+        maxlength="10"
+        minlength="10"
+        pattern="[0-9]{10}"
+        placeholder="Mobile"
+        required
+    >
+
+    @error('mobile')
+        <span class="text-danger">{{ $message }}</span>
+    @enderror
+</div>
 
                         <div class="col-md-6 mb-2">
                             <input type="email" name="email" class="form-control" placeholder="Email" required>
@@ -85,8 +98,8 @@
                                 <option value="">Select Role</option>
                                 <option value="subadmin">Sub Admin</option>
                                 <option value="accountant">Accountant</option>
-                                <option value="station_manager">Fuel station Manager</option>
-                                <option value="attendant">Fuel attendant</option>
+                                <!-- <option value="station_manager">Fuel station Manager</option>
+                                <option value="attendant">Fuel attendant</option> -->
                                 @endif
                             </select>
                         </div>
@@ -176,10 +189,10 @@
                     Fuel Attendant
                 </option>
 
-                <option value="manager"
+                <!-- <option value="manager"
                     {{ request('role') == 'manager' ? 'selected' : '' }}>
                     Organization Manager
-                </option>
+                </option> -->
 
                 <option value="accountant"
                     {{ request('role') == 'accountant' ? 'selected' : '' }}>
@@ -276,10 +289,10 @@
 
             <th>#</th>
             <th>Name</th>
-            <th>Mobile</th>
             <th>Email</th>
-            <th>Role</th>
+            <th>Mobile</th>
             <th>Organization</th>
+            <th>Role</th>
             <th>User Status</th>
             <th>Station</th>
             <th>Action</th>
@@ -301,18 +314,20 @@
                 {{ $user->last_name }}
             </td>
 
-            <td style="text-align: center">{{ $user->mobile }}</td>
 
             <td style="text-align: center">{{ $user->email }}</td>
+            <td style="text-align: center">{{ $user->mobile }}</td>
 
+
+            
+
+            <td style="text-align: center">
+                {{ $user->organization->company_name ?? 'N/A' }}
+            </td>
             <td style="text-align: center">
                 <span class="badge bg-primary">
                     {{ ucfirst($user->role) }}
                 </span>
-            </td>
-
-            <td style="text-align: center">
-                {{ $user->organization->company_name ?? 'N/A' }}
             </td>
             <td style="text-align: center">
                 @if ($user->status == "Active")
@@ -405,6 +420,9 @@
                         <input type="text"
                                name="mobile"
                                class="form-control"
+                               maxlength="10"
+                                minlength="10"
+                                pattern="[0-9]{10}"
                                value="{{ $user->mobile }}">
                     </div>
 

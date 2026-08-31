@@ -60,7 +60,7 @@
 
     <select name="type" id="type" class="form-control" required>
         <option value="">-- Select Organization Type --</option>
-        <option value="fuelcamp">Fuel Company</option>
+        <option value="	FUEL COMPANY">	FUEL COMPANY</option>
         <option value="other">Other</option>
     </select>
 </div>
@@ -82,7 +82,7 @@
 <div class="alert alert-dismissible fade show flash-message" role="alert">
   <div class="d-flex align-items-center">
     <i class="bi bi-check-circle-fill me-2"></i> <div class="flex-grow-1">
-      <h6 class="alert-heading mb-1">Guest Information</h6>
+      <h6 class="alert-heading mb-1">Company Information</h6>
       <p class="mb-0" style="color: green">{{ session('success') }}</p>
     </div>
     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
@@ -96,7 +96,7 @@
             <th>#</th>
             <th>Company Name</th>
             <th>Type</th>
-            <th>Action</th>
+            <th style="text-align: center">Action</th>
         </tr>
     </thead>
 
@@ -105,31 +105,35 @@
         <tr>
             <td>{{ $index + 1 }}</td>
             <td>{{ $gapco->company_name }}</td>
-            <td>{{ $gapco->type }}</td>
+            <td style="text-transform: uppercase">{{ $gapco->type }}</td>
 
-            <td class="d-flex gap-1">
+            <td style="text-align: center">
+    <div class="d-flex justify-content-center gap-2">
 
-    <!-- EDIT BUTTON -->
-    <button class="btn btn-primary btn-sm"
-        data-bs-toggle="modal"
-        data-bs-target="#edit{{ $gapco->id }}">
-        <i class="bi bi-pencil-square"></i>
-    </button>
-
-    <!-- DELETE BUTTON -->
-    <form action="{{ route('gapcos.destroy', $gapco->id) }}"
-          method="POST"
-          onsubmit="return confirm('Una uhakika unataka kufuta kampuni hii?')">
-
-        @csrf
-        @method('DELETE')
-
-        <button type="submit" class="btn btn-danger btn-sm">
-            <i class="bi bi-trash"></i>
+        <!-- EDIT BUTTON -->
+        <button class="btn btn-primary btn-sm d-flex align-items-center justify-content-center"
+                data-bs-toggle="modal"
+                data-bs-target="#edit{{ $gapco->id }}"
+                style="width: 38px; height: 38px;">
+            <i class="bi bi-pencil-square"></i>
         </button>
 
-    </form>
+        <!-- DELETE BUTTON -->
+        <form action="{{ route('gapcos.destroy', $gapco->id) }}"
+              method="POST"
+              onsubmit="return confirm('Una uhakika unataka kufuta kampuni hii?')"
+              class="m-0">
+            @csrf
+            @method('DELETE')
 
+            <button type="submit"
+                    class="btn btn-danger btn-sm d-flex align-items-center justify-content-center"
+                    style="width: 38px; height: 38px;">
+                <i class="bi bi-trash"></i>
+            </button>
+        </form>
+
+    </div>
 </td>
         </tr>
 
@@ -157,9 +161,11 @@
                                 </div>
 
                                 <div class="col-md-6 mb-2">
-                                    <input type="text" name="type"
-                                        value="{{ $gapco->type }}"
-                                        class="form-control">
+                                     <select name="type" id="type" class="form-control" required>
+                                <option value="">-- Select Organization Type --</option>
+                                <option value="	FUEL COMPANY">	FUEL COMPANY</option>
+                                <option value="other">OTHER</option>
+                            </select>
                                     
                                 </div>
                             </div>

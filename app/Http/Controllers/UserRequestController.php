@@ -8,6 +8,8 @@ use App\Models\SystemUser;
 use App\Models\UserRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Voucher;
+use App\Models\VoucherAssignment;
 use Illuminate\Support\Facades\Mail;
 
 class UserRequestController extends Controller
@@ -24,7 +26,18 @@ class UserRequestController extends Controller
         ->latest()
         ->get();
 
-    }else{
+    }
+    elseif(Auth::guard('web')->user()->role == "admin"){
+        $requests = UserRequest::with([
+        'user.organization',
+        'fuel_request',
+        'payment'
+    ])
+    ->latest()
+    ->get();
+
+    }
+    else{
 
         $requests = UserRequest::with([
         'user.organization',
@@ -35,7 +48,7 @@ class UserRequestController extends Controller
     ->latest()
     ->get();
     }
-    $organizations = Gapco::where("type","fuelcamp")->get();
+    $organizations = Gapco::where("type","FUEL COMPANY")->get();
 
     $users = SystemUser::all();
     $noteCount = Notification::where("read_by","admin")->count();
@@ -112,7 +125,7 @@ Amount: " . number_format($req->request_amount) . " TZS
 Number of Litres: {$req->number_of_litre}
 Please make payment to the following number to get Vouchar:
 Number: 0676434424
-Name: Fauzia Shemegi wangu
+Name: Fauzia 
 Thank you.",
                 function ($message) use ($user) {
                     $message->to($user->email)
@@ -125,5 +138,55 @@ Thank you.",
     $req->save();
 
     return back()->with('success', 'Status updated successfully');
+}
+
+   public function fuelReport(Request $request)
+{
+    $user = Auth::guard('web')->user();
+
+    $query = VoucherAssignment::query();
+
+    // Load relationships
+    $query->with([
+        'voucher',
+        'driver'
+    ]);
+
+    // Filter kwa kampuni (kama si admin)
+    if ($user->role != 'admin') {
+
+        $query->whereHas('driver', function ($q) use ($user) {
+
+            $q->where('organization_id', $user->organization_id);
+
+        });
+
+    }
+
+    // Filter kwa tarehe
+    if ($request->filled('start_date') && $request->filled('end_date')) {
+
+        $query->whereBetween('created_at', [
+            $request->start_date . ' 00:00:00',
+            $request->end_date . ' 23:59:59'
+        ]);
+
+    }
+
+    $assignments = $query->orderBy('created_at', 'desc')->get();
+
+    $totalAmount = $assignments->sum(function ($assignment) {
+
+        return $assignment->voucher->amount ?? 0;
+
+    });
+
+    $totalLiters = $totalAmount / 3000;
+
+    return view('report2', compact(
+        'assignments',
+        'totalAmount',
+        'totalLiters'
+    ));
 }
 }

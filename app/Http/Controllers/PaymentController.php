@@ -3,8 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Notification;
+use App\Models\Gapco;
 use App\Models\Payment;
 use App\Models\SystemUser;
+use App\Models\VoucherAssignment;
+use App\Models\Station;
 use App\Models\UserRequest;
 use App\Models\Voucher;
 use Illuminate\Http\Request;
@@ -25,33 +28,120 @@ class PaymentController extends Controller
         return view('paymentverify', compact('payments', 'requests', 'users','noteCount','notes'));
     }
 
-     public function index2(Request $request)
-    {
-        $payments = collect();       // tupu mpaka user afilter
-        $totalRevenue = 0;
-        $totalTransactions = 0;
-        $filtered = false;           // kujua kama user tayari amefilter
+    public function index2(Request $request)
+{
+    $user = Auth::guard('web')->user();
 
-        if ($request->filled('start_date') && $request->filled('end_date')) {
+    // Aina ya Ripoti Iliyochaguliwa (Default ni payments)
+    $reportType = $request->input('report_type', 'payments');
+
+    // Variable za matokeo
+    $payments = collect();
+    $organizations = collect();
+    $stations = collect();
+    $fuelAssignments = collect();
+
+    $totalRevenue = 0;
+    $totalTransactions = 0;
+    $filtered = false;
+
+    // Filter za tarehe
+    $startDate = $request->input('start_date');
+    $endDate = $request->input('end_date');
+
+    // 1. RIPOTI YA PAYMENTS
+    if ($reportType == 'payments') {
+        $query = Payment::with([
+            'request.user',
+            'request.fuel_request',
+            'verifier'
+        ]);
+
+        if ($startDate && $endDate) {
             $filtered = true;
-
-            $payments = Payment::with(['request', 'verifier'])
-                ->whereDate('created_at', '>=', $request->start_date)
-                ->whereDate('created_at', '<=', $request->end_date)
-                ->orderBy('created_at', 'desc')
-                ->get();
-
-            $totalRevenue = $payments->where('status', 'confirmed')->sum('amount_paid');
-            $totalTransactions = $payments->count();
+            $query->whereDate('created_at', '>=', $startDate)
+                  ->whereDate('created_at', '<=', $endDate);
         }
-           $noteCount = Notification::where("read_by","admin")->count();
-        $notes = Notification::where("read_by","admin")->get();
 
-        return view('report', compact(
-            'payments', 'totalRevenue', 'totalTransactions', 'filtered','noteCount','notes'
-        ));
+        if ($user->role != 'admin') {
+            $query->whereHas('request', function ($q) use ($user) {
+                $q->where('organization_id', $user->organization_id);
+            });
+        }
+
+        $payments = $query->orderBy('created_at', 'desc')->get();
+        $totalRevenue = $payments->where('status', 'confirmed')->sum('amount_paid');
+        $totalTransactions = $payments->count();
+    } 
+
+    // 2. RIPOTI YA ORGANIZATIONS (MAKAMPUNI)
+    elseif ($reportType == 'organizations') {
+        $query = Gapco::query();
+
+        if ($startDate && $endDate) {
+            $filtered = true;
+            $query->whereDate('created_at', '>=', $startDate)
+                  ->whereDate('created_at', '<=', $endDate);
+        }
+
+        $organizations = $query->orderBy('created_at', 'desc')->get();
     }
-   
+
+    // 3. RIPOTI YA STATIONS (VITUO VYA MAFUTA)
+    elseif ($reportType == 'stations') {
+        $query = Station::with('organization');
+
+        if ($startDate && $endDate) {
+            $filtered = true;
+            $query->whereDate('created_at', '>=', $startDate)
+                  ->whereDate('created_at', '<=', $endDate);
+        }
+
+        if ($user->role != 'admin') {
+            $query->where('organization_id', $user->organization_id);
+        }
+
+        $stations = $query->orderBy('created_at', 'desc')->get();
+    }
+
+    // 4. RIPOTI YA FUEL VOUCHERS (MADEREVA WALIOWEKA/WALIOPEWA MAFUTA)
+    elseif ($reportType == 'driver_fuel') {
+        $query = VoucherAssignment::with(['driver', 'voucher', 'voucher_verify']);
+
+        if ($startDate && $endDate) {
+            $filtered = true;
+            $query->whereDate('created_at', '>=', $startDate)
+                  ->whereDate('created_at', '<=', $endDate);
+        }
+
+        if ($user->role != 'admin') {
+            $query->whereHas('driver', function ($q) use ($user) {
+                $q->where('organization_id', $user->organization_id);
+            });
+        }
+
+        $fuelAssignments = $query->orderBy('created_at', 'desc')->get();
+        $totalRevenue = $fuelAssignments->sum('amount'); // Jumla ya kiasi cha mafuta yaliyogawiwa
+        $totalTransactions = $fuelAssignments->count();
+    }
+
+    // Taarifa za Notification
+    $noteCount = Notification::where("read_by", "admin")->count();
+    $notes = Notification::where("read_by", "admin")->get();
+
+    return view('report', compact(
+        'reportType',
+        'payments',
+        'organizations',
+        'stations',
+        'fuelAssignments',
+        'totalRevenue',
+        'totalTransactions',
+        'filtered',
+        'noteCount',
+        'notes'
+    ));
+}
     public function verify(Request $request, $id)
 {
     $payment = Payment::findOrFail($id);
@@ -71,7 +161,7 @@ class PaymentController extends Controller
         'referrence_number' => $request->referrence_number,
         'amount_paid'       => $request->amount_paid,
         'status'            => 'confirmed',
-        'verified_by'       => 2,
+        'verified_by'       => Auth::guard('web')->user()->id,
     ]);
     $user = SystemUser::find($payment->request->requested_by);
 
@@ -121,7 +211,7 @@ Thank you.",
         'referrence_number' => $request->referrence_number,
         'amount_paid'       => $request->amount_paid,
         'status'            => 'pending',
-        'verified_by'       => 2, 
+        'verified_by'       => Auth::guard('web')->user()->id, 
     ]);
     Notification::create([
         "title" => "Payment alert",

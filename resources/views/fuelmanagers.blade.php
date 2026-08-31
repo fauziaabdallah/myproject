@@ -48,59 +48,130 @@
             <form action="{{ route('fuelManagers.store') }}" method="POST">
                 @csrf
 
-                <div class="modal-body">
+<div class="modal-body">
 
-                    <!-- ROW 1 -->
-                    <div class="row">
-                        <div class="col-md-6 mb-2">
-                            <label for="">First Name</label>
-                            <input type="text" name="firstname" class="form-control" placeholder="First Name" required>
-                        </div>
+    <!-- ROW 1 -->
+    <div class="row">
+        <div class="col-md-6 mb-2">
+            <label>First Name</label>
+            <input type="text"
+                   name="firstname"
+                   class="form-control"
+                   placeholder="First Name"
+                   required>
+        </div>
 
-                        <div class="col-md-6 mb-2">
-                            <label for="">Last Name</label>
-                            <input type="text" name="lastname" class="form-control" placeholder="Last Name" required>
-                        </div>
-                    </div>
+        <div class="col-md-6 mb-2">
+            <label>Last Name</label>
+            <input type="text"
+                   name="lastname"
+                   class="form-control"
+                   placeholder="Last Name"
+                   required>
+        </div>
+    </div>
 
-                    <!-- ROW 2 -->
-                    <div class="row">
-                        <div class="col-md-6 mb-2">
-                            <label for="">Phone Number</label>
-                            <input type="text" name="mobile" class="form-control" placeholder="Mobile" required>
-                        </div>
+    <!-- ROW 2 -->
+    <div class="row">
+        <div class="col-md-6 mb-2">
+            <label>Phone Number</label>
+            <input type="text"
+                   name="mobile"
+                   class="form-control"
+                   placeholder="Mobile"
+                   required
+                   maxlength="10"
+                   minlength="10"
+                   pattern="[0-9]{10}">
+        </div>
 
-                        <div class="col-md-6 mb-2">
-                            <label for="">Email</label>
-                            <input type="email" name="email" class="form-control" placeholder="Email" required>
-                        </div>
-                    </div>
+        <div class="col-md-6 mb-2">
+            <label>Email</label>
+            <input type="email"
+                   name="email"
+                   class="form-control"
+                   placeholder="Email"
+                   required>
+        </div>
+    </div>
 
-                    <!-- ROW 3 -->
-                    <div class="row">
-                        <div class="col-md-6 mb-2">
-                            <label for="">Password</label>
-                            <input type="password" name="password" class="form-control" placeholder="Password" value="12345">
-                        </div>
-                 
-                        <div class="col-md-6 mb-2">
-                            <label for="">Select role</label>
-                            <select name="role" class="form-control" required>
-                                <option value="">Select role</option>
-                                    <option value="attendant">
-                                        Fuel Attendant
-                                    </option>
-                            </select>
-                        </div>
-                    </div>
+    <!-- ROW 3 -->
+    <div class="row">
 
-                </div>
+        <div class="col-md-6 mb-2">
+            <label>Password</label>
+            <input type="password"
+                   name="password"
+                   class="form-control"
+                   placeholder="Password"
+                   value="12345">
+        </div>
 
-                <div class="modal-footer">
-                    <button class="btn btn-success">Save</button>
-                </div>
+        <div class="col-md-6 mb-2">
+            <label>Select Role</label>
+            <select name="role"
+                    class="form-control"
+                    required>
 
-            </form>
+                <option value="">Select role</option>
+
+                @if(Auth::guard('web')->user()->role == 'subadmin')
+
+                    <option value="station_manager">
+                        Station Manager
+                    </option>
+
+                @else
+
+                    <option value="attendant">
+                        Fuel Attendant
+                    </option>
+
+                @endif
+
+            </select>
+        </div>
+
+    </div>
+
+
+    {{-- SELECT STATION --}}
+    @if(Auth::guard('web')->user()->role == 'subadmin')
+
+        <div class="row">
+            <div class="col-md-6 mb-2">
+                <label for="station_id">Select Station</label>
+
+                <select name="station_id"
+                        id="station_id"
+                        class="form-control"
+                        required>
+
+                    <option value="">Select Station</option>
+
+                    @foreach($stations as $station)
+                        <option value="{{ $station->id }}">
+                            {{ $station->station_name }}
+                        </option>
+                    @endforeach
+
+                </select>
+            </div>
+        </div>
+
+    @endif
+
+</div>
+
+<div class="modal-footer">
+    <button type="submit" class="btn btn-success">
+        Save
+    </button>
+</div>
+
+</form>
+
+
 
         </div>
     </div>
@@ -174,7 +245,11 @@
                                 value="{{ $user->lastname }}" class="form-control mb-2">
 
                             <input type="text" name="mobile"
-                                value="{{ $user->mobile }}" class="form-control mb-2">
+                                value="{{ $user->mobile }}" class="form-control mb-2" 
+                                maxlength="10"
+                                minlength="10"
+                                pattern="[0-9]{10}"
+                                >
 
                             <input type="email" name="email"
                                 value="{{ $user->email }}" class="form-control mb-2">

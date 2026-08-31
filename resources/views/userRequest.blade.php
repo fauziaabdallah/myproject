@@ -109,15 +109,24 @@
     <thead class="table-dark">
         <tr>
             <th>#</th>
+            @if(Auth::guard('web')->user()->role == "accountant")
+             <th>Requested To</th>
+            @endif
             @if(Auth::guard('web')->user()->role != "accountant")
             <th>Organization</th>
             @endif
-            <th>Requested Amount</th>
+            <th>Amount</th>
             <th>Litre(s)</th>
             <th>Requested Date</th>
+             @if(Auth::guard('web')->user()->role == "admin")
+             <th>Requested To</th>
+            @endif
             <th>Request Status</th>
             <th>Payment Status</th>
+            
+             @if(Auth::guard('web')->user()->role == "subadmin" || Auth::guard('web')->user()->role == "accountant")
                 <th>Action</th>
+                @endif
             
         </tr>
     </thead>
@@ -127,8 +136,12 @@
         @forelse($requests as $index => $req)
 
         <tr>
+            
 
             <td>{{ $index + 1 }}</td>
+             @if(Auth::guard('web')->user()->role == "accountant")
+             <td>{{ $req->fuel_request->company_name }}</td>
+            @endif
             @if(Auth::guard('web')->user()->role != "accountant")
 
             <td>
@@ -147,6 +160,9 @@
             <td>
                 {{ date('d M Y H:i', strtotime($req->created_at)) }}
             </td>
+             @if(Auth::guard('web')->user()->role == "admin")
+             <td>{{ $req->fuel_request->company_name }}</td>
+            @endif
 
             <td class="text-center">
                 @if($req->status == 'pending')
@@ -192,24 +208,31 @@
 
             <td class="text-center">
 
-                @if($req->status=="pending")
+               @if($req->status == "pending")
 
-                <button class="btn btn-success btn-sm"
-                        data-bs-toggle="modal"
-                        data-bs-target="#payment{{ $req->id }}" disabled>
+    <button class="btn btn-success btn-sm"
+            data-bs-toggle="modal"
+            data-bs-target="#payment{{ $req->id }}" disabled>
+        Pay Now
+    </button>
 
-                        Pay Now
+@elseif(optional($req->payment)->status == "confirmed")
 
-                    </button>
-                    @else
-                    <button class="btn btn-success btn-sm"
-                        data-bs-toggle="modal"
-                        data-bs-target="#payment{{ $req->id }}">
+    <button class="btn btn-success btn-sm"
+            data-bs-toggle="modal"
+            data-bs-target="#payment{{ $req->id }}" disabled>
+        Pay Now
+    </button>
 
-                        Pay Now
+@else
 
-                    </button>
-                    @endif
+    <button class="btn btn-success btn-sm"
+            data-bs-toggle="modal"
+            data-bs-target="#payment{{ $req->id }}">
+        Pay Now
+    </button>
+
+@endif
             </td>
             @endif
             @if(Auth::guard('web')->user()->role == "subadmin")
@@ -247,6 +270,7 @@
 
         </tr>
         <!-- Verify Payment Modal -->
+           @if($req->payment)
 <div class="modal fade" id="verify{{ $req->payment->id }}" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -255,7 +279,7 @@
                 <h5 class="modal-title">Verify Payment</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
-
+          
             <form action="{{ route('payments.verify', $req->payment->id) }}" method="POST">
                 @csrf
                 @method('PUT')
@@ -263,7 +287,7 @@
                 <div class="modal-body">
 
                     <div class="mb-3">
-                        <label class="form-label">Reference Number</label>
+                        <label class="form-label">Mobile Number</label>
                         <input type="text"
                                name="referrence_number"
                                class="form-control"
@@ -276,7 +300,7 @@
                                name="amount_paid"
                                class="form-control"
                                value="{{ $req->request_amount }}"
-                               required>
+                               required readonly>
                     </div>
 
                     <div class="alert alert-warning">
@@ -299,6 +323,7 @@
                 </div>
 
             </form>
+            @endif
 
         </div>
     </div>
@@ -342,7 +367,7 @@
                                     name="amount_paid"
                                     class="form-control"
                                     value="{{ $req->request_amount }}"
-                                    required>
+                                    required readonly>
 
                             </div>
 

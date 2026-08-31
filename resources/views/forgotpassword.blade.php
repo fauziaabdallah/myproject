@@ -18,7 +18,7 @@
             justify-content: center;
             align-items: center;
             font-family: 'Segoe UI', sans-serif;
-            background-image: url("{{ asset('images/image2.jpeg') }}");
+            background-image: url("{{ asset('images/pic1.jpg') }}");
             
             background-size: cover;
             background-position: center;

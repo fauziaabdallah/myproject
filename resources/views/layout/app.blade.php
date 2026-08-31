@@ -199,16 +199,23 @@ body {
     <div class="sidebar-header">
 @if(Auth::guard('web')->check() && Auth::guard('web')->user()->role == "admin")
         Admin
-@elseif(Auth::guard('web')->check() && Auth::guard('web')->user()->role == "manager")
-Manager
+@elseif(Auth::guard('web')->check() && Auth::guard('web')->user()->role == "subadmin")
+Sub Admin <br>
+{{ optional(Auth::guard('web')->user()->organization)->company_name }}
 @elseif(Auth::guard('web')->check() && Auth::guard('web')->user()->role == "accountant")
-Accountant
+Accountant <br>
+{{ optional(Auth::guard('web')->user()->organization)->company_name }}
+
 @elseif(Auth::guard('web')->check() && Auth::guard('web')->user()->role == "driver")
-Driver
+Driver<br>
+{{ optional(Auth::guard('web')->user()->organization)->company_name }}
+
 @elseif(Auth::guard('web')->check() && Auth::guard('web')->user()->role == "station_manager")
-Station Manager
+Station Manager<br>
+{{ optional(Auth::guard('web')->user()->organization)->company_name }}
+
 @elseif(Auth::guard('web')->check() && Auth::guard('web')->user()->role == "attendant")
-Fuel attendant
+Fuel attendant<br>
 
 
 
@@ -235,7 +242,7 @@ Fuel attendant
    class="{{ request()->routeIs('gapcos.*') ? 'active' : '' }}">
 
     <i class="bi bi-buildings-fill"></i>
-    <span>Manage Organizations</span>
+    <span>Organizations</span>
 
 </a>
 
@@ -243,9 +250,66 @@ Fuel attendant
    class="{{ request()->routeIs('users.*') ? 'active' : '' }}">
 
     <i class="bi bi-people-fill"></i>
-    <span>Manage Users</span>
+    <span>Users</span>
 
 </a>
+
+<a href="{{ route('userRequest.index') }}"
+   class="{{ request()->routeIs('userRequest.*') ? 'active' : '' }}">
+
+    <i class="bi bi-journal-text"></i>
+    <span>Fuel Requests</span>
+
+</a>
+
+{{-- <a href="{{ route('payments.index') }}"
+   class="{{ request()->routeIs('payments.*') ? 'active' : '' }}">
+
+    <i class="bi bi-cash-stack"></i>
+    <span>Payments Info</span>
+
+</a> --}}
+
+<a href="{{ route('reports.payments') }}"
+   class="{{ request()->routeIs('reports.payments') ? 'active' : '' }}">
+
+    <i class="bi bi-bar-chart-line-fill"></i>
+    <span>Reports</span>
+
+</a>
+
+<a href="{{ route('settings')}}"
+   class="{{ request()->routeIs('settings') ? 'active' : '' }}">
+
+    <i class="bi bi-gear-fill"></i>
+    <span>Settings</span>
+
+</a>
+@elseif(Auth::guard('web')->check() && Auth::guard('web')->user()->role == "subadmin")
+
+<a href="/dashboard"
+   class="{{ request()->is('dashboard') ? 'active' : '' }}">
+
+    <i class="bi bi-speedometer2"></i>
+    <span>Dashboard</span>
+
+</a>
+<a href="{{ route('fuelManagers.index') }}"
+   class="{{ request()->routeIs('fuelManagers.*') ? 'active' : '' }}">
+
+    <i class="bi bi-people-fill"></i>
+    <span>Staff Info</span>
+
+</a>
+
+<a href="{{ route('stations.index') }}"
+   class="{{ request()->routeIs('stations.*') ? 'active' : '' }}">
+
+    <i class="bi bi-fuel-pump-fill"></i>
+    <span>Stations</span>
+
+</a>
+
 
 <a href="{{ route('userRequest.index') }}"
    class="{{ request()->routeIs('userRequest.*') ? 'active' : '' }}">
@@ -271,57 +335,7 @@ Fuel attendant
 
 </a>
 
-<a href="#"
-   class="">
-
-    <i class="bi bi-gear-fill"></i>
-    <span>Settings</span>
-
-</a>
-@elseif(Auth::guard('web')->check() && Auth::guard('web')->user()->role == "subadmin")
-
-<a href="/dashboard"
-   class="{{ request()->is('dashboard') ? 'active' : '' }}">
-
-    <i class="bi bi-speedometer2"></i>
-    <span>Dashboard</span>
-
-</a>
-
-<a href="{{ route('stations.index') }}"
-   class="{{ request()->routeIs('stations.*') ? 'active' : '' }}">
-
-    <i class="bi bi-fuel-pump-fill"></i>
-    <span>Manage Stations</span>
-
-</a>
-
-
-<a href="{{ route('userRequest.index') }}"
-   class="{{ request()->routeIs('userRequest.*') ? 'active' : '' }}">
-
-    <i class="bi bi-journal-text"></i>
-    <span>Fuel Requests</span>
-
-</a>
-
-{{-- <a href="{{ route('payments.index') }}"
-   class="{{ request()->routeIs('payments.*') ? 'active' : '' }}">
-
-    <i class="bi bi-cash-stack"></i>
-    <span>Payments Info</span>
-
-</a> --}}
-
-<a href="#"
-   class="">
-
-    <i class="bi bi-bar-chart-line-fill"></i>
-    <span>Reports</span>
-
-</a>
-
-<a href="#"
+<a href="{{ route('settings')}}"
    class="">
 
     <i class="bi bi-gear-fill"></i>
@@ -356,7 +370,7 @@ Fuel attendant
 
 
 
-<a href="#"
+<a href="{{ route('settings')}}"
    class="">
 
     <i class="bi bi-gear-fill"></i>
@@ -378,7 +392,7 @@ Fuel attendant
 
 </a>
 <a href="{{ route('index1') }}"
-   class="">
+   class="{{ request()->routeIs('index1') ? 'active' : '' }}">
 
     <i class="bi bi-person-plus-fill"></i>
     <span>Registration</span>
@@ -399,13 +413,7 @@ Fuel attendant
     <span>Fuel Request</span>
 
 </a>
-<a href="#"
-   class="">
 
-    <i class="bi bi-file-earmark-plus-fill"></i>
-    <span>Payment history</span>
-
-</a>
 <a href="{{ route('expired') }}"
    class="{{ request()->routeIs('expired') ? 'active' : '' }}">
 
@@ -414,8 +422,8 @@ Fuel attendant
 
 </a>
 
-<a href="#"
-   class="">
+<a href="{{ route('settings')}}"
+   class="{{ request()->routeIs('settings') ? 'active' : '' }}">
 
     <i class="bi bi-gear-fill"></i>
     <span>Settings</span>
@@ -452,17 +460,13 @@ Fuel attendant
 
 </a>
 
-<a href="#"
+<a href="{{ route('settings')}}"
    class="">
 
     <i class="bi bi-gear-fill"></i>
     <span>Settings</span>
 
 </a>
-
-
-
-
 
 @elseif(Auth::guard('web')->check() && Auth::guard('web')->user()->role == "station_manager")
 
@@ -490,7 +494,7 @@ Fuel attendant
 
 </a>
 
-<a href="#"
+<a href="{{ route('reports.fuel')}}"
    class="">
 
     <i class="bi bi-clipboard-data-fill"></i>
@@ -498,18 +502,13 @@ Fuel attendant
 
 </a>
 
-<a href="#"
+<a href="{{ route('settings')}}"
    class="">
 
     <i class="bi bi-gear-fill"></i>
     <span>Settings</span>
 
 </a>
-
-
-
-
-
 @elseif(Auth::guard('web')->check() && Auth::guard('web')->user()->role == "attendant")
 
 <a href="/dashboard"
@@ -528,7 +527,7 @@ Fuel attendant
 
 </a>
 
-<a href="#"
+<a href="{{ route('settings')}}"
    class="">
 
     <i class="bi bi-gear-fill"></i>

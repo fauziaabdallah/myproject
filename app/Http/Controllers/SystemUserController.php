@@ -105,30 +105,34 @@ class SystemUserController extends Controller
 
     
     public function store(Request $request)
-    {
-        $request->validate([
-            'first_name'      => 'required',
-            'last_name'       => 'required',
-            'mobile'          => 'required',
-            'email'           => 'required|email|unique:system_users,email',
-            'password'        => 'required|min:4',
-            'role'            => 'required',
-            'organization_id' => 'required|exists:organizations,id',
-        ]);
+{
+    $request->validate([
+        'first_name'       => 'required',
+        'last_name'        => 'required',
+        'mobile'           => 'required|min:10',
+        'email'            => 'required|email|unique:system_users,email',
+        'password'         => 'required|min:4',
+        'role'             => 'required',
+        'organization_id'  => 'required_if:role,admin|nullable|exists:organizations,id',
+    ]);
 
-        SystemUser::create([
-            'first_name'      => $request->first_name,
-            'last_name'       => $request->last_name,
-            'mobile'          => $request->mobile,
-            'email'           => $request->email,
-            'password'        => Hash::make($request->password),
-            'role'            => $request->role,
-            'station_id'      => $request->station_id,
-            'organization_id' => $request->organization_id,
-        ]);
+    $organizationId = Auth::guard('web')->user()->role == 'station_manager'
+        ? Auth::guard('web')->user()->organization_id
+        : $request->organization_id;
 
-        return back()->with('success', 'User created successfully');
-    }
+    SystemUser::create([
+        'first_name'      => $request->first_name,
+        'last_name'       => $request->last_name,
+        'mobile'          => $request->mobile,
+        'email'           => $request->email,
+        'password'        => Hash::make($request->password),
+        'role'            => $request->role,
+        'station_id'      => $request->station_id,
+        'organization_id' => $organizationId,
+    ]);
+
+    return back()->with('success', 'User created successfully');
+}
 
     
     public function update(Request $request,$id)
@@ -249,31 +253,106 @@ class SystemUserController extends Controller
 
     return view('expired_vochar', compact('voucher'));
 }
-    public function verifyVoucher(Request $request)
+    public function searchVoucher(Request $request)
 {
     $request->validate([
-        'reference_number' => 'required'
+        'reference_number' => 'required|string'
     ]);
-    $user = Auth::guard('web')->user();
-    $voucher = VoucherAssignment::where('reference_number', $request->reference_number)->first();
+
+    $voucher = VoucherAssignment::with([
+        'driver.organization',
+        'voucher.request.user.organization'
+    ])
+    ->where('reference_number', $request->reference_number)
+    ->first();
 
     if (!$voucher) {
-        return back()->with('error', 'Voucher haipo');
+        return response()->json([
+            'success' => false,
+            'message' => 'Voucher not found.'
+        ], 404);
     }
+
+    // Check if already used
     if ($voucher->status !== 'pending') {
-        return back()->with('error', 'Voucher tayari imetumika');
+        return response()->json([
+            'success' => false,
+            'message' => 'This voucher has already been used.'
+        ], 422);
     }
+
+    return response()->json([
+        'success' => true,
+
+        'voucher' => [
+            'id' => $voucher->id,
+
+            'driver' => $voucher->driver->first_name . ' ' .
+                        $voucher->driver->last_name,
+
+            'organization' =>
+                $voucher->driver->organization->company_name ?? 'N/A',
+
+            'voucher_code' =>
+                $voucher->voucher->voucher_code ?? 'N/A',
+
+            'amount' => number_format($voucher->amount),
+
+            'fuel_litres' =>
+                round($voucher->amount / 3000, 2),
+
+            'reference_number' =>
+                $voucher->reference_number,
+
+            'status' =>
+                strtoupper($voucher->status),
+
+            'qr_code' =>
+                QrCode::size(200)->generate($voucher->reference_number)
+        ]
+    ]);
+}
+
+
+public function verifyVoucher(Request $request)
+{
+    $request->validate([
+        'reference_number' => 'required|string'
+    ]);
+
+    $user = Auth::guard('web')->user();
+
+    $voucher = VoucherAssignment::where(
+        'reference_number',
+        $request->reference_number
+    )->first();
+
+    if (!$voucher) {
+        return back()->with('error', 'Voucher not found.');
+    }
+
+    if ($voucher->status !== 'pending') {
+        return back()->with(
+            'error',
+            'Voucher has already been used.'
+        );
+    }
+
     $voucher->update([
         'status' => 'expired',
         'verified_by' => $user->id,
     ]);
 
-    return back()->with('success', 'Voucher verified successfully');
+    return back()->with(
+        'success',
+        'Voucher verified successfully.'
+    );
 }
 
     public function showverify(){
         $vouchers = VoucherAssignment::with('driver.organization')
                 ->where("status","expired")
+                ->OrderBy('created_at','desc')
                 ->get();
         return view("verify_voucher",compact('vouchers'));
     }

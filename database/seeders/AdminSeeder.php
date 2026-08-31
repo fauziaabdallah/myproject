@@ -23,7 +23,7 @@ class AdminSeeder extends Seeder
                 "email" => "fauziaabdallah2025@gmail.com",
                 "password" => Hash::make("12345"),
                 "role" => "admin",
-                "organization_id" => 1,
+                "organization_id" => 16,
 
             ]);
         }

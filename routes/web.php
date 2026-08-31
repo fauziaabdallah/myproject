@@ -5,6 +5,7 @@ use App\Http\Controllers\FuelManagerController;
 use App\Http\Controllers\GapcoController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\StationController;
 use App\Http\Controllers\SystemUserController;
 use App\Http\Controllers\UserRequestController;
@@ -47,3 +48,14 @@ Route::get('/vouchers/{id}', [AdminController::class, 'show'])
 
 Route::get('/reports/payments', [PaymentController::class, 'index2'])
     ->name('reports.payments');
+Route::get('/reports/fuel-report',[UserRequestController::class,'fuelReport'])
+    ->name('reports.fuel');
+
+    Route::get('/settings', [SettingsController::class, 'index'])->name('settings');
+    
+    // Update Profile Information
+    Route::put('/settings/profile', [SettingsController::class, 'updateProfile'])->name('profile.update');
+    Route::post('/voucher/search', [SystemUserController::class, 'searchVoucher'])
+    ->name('voucher.search');
+    // Update Password
+    Route::put('/settings/password', [SettingsController::class, 'updatePassword'])->name('password.update1');
