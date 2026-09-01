@@ -281,8 +281,8 @@ Fuel attendant<br>
 <a href="{{ route('settings')}}"
    class="{{ request()->routeIs('settings') ? 'active' : '' }}">
 
-    <i class="bi bi-gear-fill"></i>
-    <span>Settings</span>
+    <i class="bi bi-person"></i>
+    <span>Profile</span>
 
 </a>
 @elseif(Auth::guard('web')->check() && Auth::guard('web')->user()->role == "subadmin")
@@ -338,8 +338,8 @@ Fuel attendant<br>
 <a href="{{ route('settings')}}"
    class="">
 
-    <i class="bi bi-gear-fill"></i>
-    <span>Settings</span>
+    <i class="bi bi-person"></i>
+    <span>Profile</span>
 
 </a>
 
@@ -373,8 +373,8 @@ Fuel attendant<br>
 <a href="{{ route('settings')}}"
    class="">
 
-    <i class="bi bi-gear-fill"></i>
-    <span>Settings</span>
+    <i class="bi bi-person"></i>
+    <span>Profile</span>
 
 </a>
 
@@ -425,8 +425,8 @@ Fuel attendant<br>
 <a href="{{ route('settings')}}"
    class="{{ request()->routeIs('settings') ? 'active' : '' }}">
 
-    <i class="bi bi-gear-fill"></i>
-    <span>Settings</span>
+    <i class="bi bi-person"></i>
+    <span>Profile</span>
 
 </a>
 
@@ -463,8 +463,8 @@ Fuel attendant<br>
 <a href="{{ route('settings')}}"
    class="">
 
-    <i class="bi bi-gear-fill"></i>
-    <span>Settings</span>
+    <i class="bi bi-person"></i>
+    <span>Profile</span>
 
 </a>
 
@@ -505,8 +505,8 @@ Fuel attendant<br>
 <a href="{{ route('settings')}}"
    class="">
 
-    <i class="bi bi-gear-fill"></i>
-    <span>Settings</span>
+    <i class="bi bi-person"></i>
+    <span>Profile</span>
 
 </a>
 @elseif(Auth::guard('web')->check() && Auth::guard('web')->user()->role == "attendant")
@@ -530,8 +530,8 @@ Fuel attendant<br>
 <a href="{{ route('settings')}}"
    class="">
 
-    <i class="bi bi-gear-fill"></i>
-    <span>Settings</span>
+    <i class="bi bi-person"></i>
+    <span>Profile</span>
 
 </a>
 

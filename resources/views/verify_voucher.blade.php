@@ -114,7 +114,7 @@
                         <i class="bi bi-search"></i>
                         Search by Reference Number
 
-                    </button>
+                    </button><br><br>
 
 
                     <button
@@ -156,7 +156,7 @@
                                     id="reference_number"
                                     class="form-control"
                                     placeholder="Enter voucher reference number"
-                                    required>
+                                    required><br>
 
                             </div>
 
@@ -396,9 +396,9 @@
 
                                 <span
                                     id="voucherStatus"
-                                    class="badge bg-warning">
+                                    class="badge bg-success">
 
-                                    PENDING
+                                    Active
 
                                 </span>
 
@@ -635,7 +635,7 @@
                         @if($v->status == 'pending')
 
                             <span class="badge bg-warning">
-                                Pending
+                                Active
                             </span>
 
                         @else
@@ -1063,7 +1063,7 @@ function searchVoucher(referenceNumber) {
 
 
         status.innerText =
-            voucher.status;
+            'ACTIVE';
 
 
         if (
@@ -1072,7 +1072,7 @@ function searchVoucher(referenceNumber) {
         ) {
 
             status.className =
-                'badge bg-warning';
+                'badge bg-success';
 
         }
         else {

@@ -169,9 +169,9 @@
                             @if($assignment->status == 'approved' || $assignment->status == 'used')
                                 <span class="badge bg-success">{{ ucfirst($assignment->status) }}</span>
                             @elseif($assignment->status == 'pending')
-                                <span class="badge bg-warning text-dark">Pending</span>
+                                <span class="badge bg-success">Active</span>
                             @else
-                                <span class="badge bg-danger">{{ ucfirst($assignment->status) }}</span>
+                                <span class="badge bg-danger">Used</span>
                             @endif
                         </td>
                     </tr>

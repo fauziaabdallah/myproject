@@ -49,7 +49,7 @@
             @endif
 
             <div class="settings-card">
-                <h4 class="fw-bold mb-4"><i class="bi bi-gear me-2"></i>Account Settings</h4>
+                <h4 class="fw-bold mb-4"><i class="bi bi-person me-2"></i>Account Profile</h4>
 
                 <!-- NAV TABS HEADER -->
                 <ul class="nav nav-tabs mb-4" id="settingsTab" role="tablist">
@@ -101,7 +101,7 @@
 
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label font-weight-bold">Email Address</label>
-                                    <input type="email" name="email" class="form-control" value="{{ old('email', Auth::guard('web')->user()->email ?? '') }}" required>
+                                    <input type="email" name="email" class="form-control" value="{{ old('email', Auth::guard('web')->user()->email ?? '') }}" readonly>
                                 </div>
 
                                 <div class="col-md-6 mb-3">

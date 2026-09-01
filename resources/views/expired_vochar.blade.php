@@ -130,7 +130,7 @@
         <div class="col-md-6">
             <div class="info-box">
                 <b>Status</b><br>
-            <span class="badge bg-danger">{{ $v->status }}</span>
+            <span class="badge bg-danger">Used</span>
     
             </div>
         </div>
@@ -157,7 +157,7 @@
     <div class="row mb-3">
         <div class="col-md-12">
             <div class="info-box">
-                <b>Expiry Date</b><br>
+                <b>Created Date</b><br>
                 {{ $v->created_at->format('j F Y') }}
             </div>
         </div>
