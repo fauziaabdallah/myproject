@@ -94,7 +94,7 @@
         Enter your credentials to login
     </p>
 
-    <form action="https://fvmsproject.up.railway.app/login" method="post">
+    <form action="{{ route('login') }}" method="post">
        @csrf
         <!-- Email -->
         <div class="mb-3 input-group">
