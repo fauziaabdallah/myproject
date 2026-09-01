@@ -285,10 +285,12 @@ class SystemUserController extends Controller
         'success' => true,
 
         'voucher' => [
+
             'id' => $voucher->id,
 
-            'driver' => $voucher->driver->first_name . ' ' .
-                        $voucher->driver->last_name,
+            'driver' =>
+                ($voucher->driver->first_name ?? '') . ' ' .
+                ($voucher->driver->last_name ?? ''),
 
             'organization' =>
                 $voucher->driver->organization->company_name ?? 'N/A',
@@ -296,7 +298,8 @@ class SystemUserController extends Controller
             'voucher_code' =>
                 $voucher->voucher->voucher_code ?? 'N/A',
 
-            'amount' => number_format($voucher->amount),
+            'amount' =>
+                number_format($voucher->amount),
 
             'fuel_litres' =>
                 round($voucher->amount / 3000, 2),
@@ -307,8 +310,16 @@ class SystemUserController extends Controller
             'status' =>
                 strtoupper($voucher->status),
 
+            /*
+            |--------------------------------------------------------------------------
+            | QR CODE
+            |--------------------------------------------------------------------------
+            | QR code contains reference number
+            */
+
             'qr_code' =>
-                QrCode::size(200)->generate($voucher->reference_number)
+                QrCode::size(200)
+                    ->generate($voucher->reference_number)
         ]
     ]);
 }
@@ -328,7 +339,10 @@ public function verifyVoucher(Request $request)
     )->first();
 
     if (!$voucher) {
-        return back()->with('error', 'Voucher not found.');
+        return back()->with(
+            'error',
+            'Voucher not found.'
+        );
     }
 
     if ($voucher->status !== 'pending') {

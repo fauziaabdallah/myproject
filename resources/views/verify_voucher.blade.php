@@ -45,57 +45,99 @@
 
     {{-- ============================= --}}
     {{-- VERIFY BUTTON --}}
-    {{-- ============================= --}}
+    {{-- VERIFY BUTTON --}}
 
-    @if(Auth::guard('web')->user()->role == "attendant")
+@if(Auth::guard('web')->user()->role == "attendant")
 
-        <button
-            class="btn btn-success mb-3"
-            data-bs-toggle="modal"
-            data-bs-target="#verifyModal">
+    <button
+        class="btn btn-success mb-3"
+        data-bs-toggle="modal"
+        data-bs-target="#verifyModal">
 
-            <i class="bi bi-check-circle"></i>
-            Verify Voucher
+        <i class="bi bi-check-circle"></i>
+        Verify Voucher
 
-        </button>
+    </button>
 
-    @endif
+@endif
 
 
-    {{-- ============================= --}}
-    {{-- VERIFY MODAL --}}
-    {{-- ============================= --}}
+{{-- VERIFY MODAL --}}
 
-    <div
-        class="modal fade"
-        id="verifyModal"
-        tabindex="-1">
+<div
+    class="modal fade"
+    id="verifyModal"
+    tabindex="-1">
 
-        <div class="modal-dialog modal-lg">
+    <div class="modal-dialog modal-lg">
 
-            <div class="modal-content">
+        <div class="modal-content">
 
-                {{-- HEADER --}}
-                <div class="modal-header bg-success text-white">
+            {{-- HEADER --}}
 
-                    <h5 class="modal-title">
-                        <i class="bi bi-check-circle"></i>
-                        Verify Voucher
-                    </h5>
+            <div class="modal-header bg-success text-white">
+
+                <h5 class="modal-title">
+                    <i class="bi bi-check-circle"></i>
+                    Verify Voucher
+                </h5>
+
+                <button
+                    type="button"
+                    class="btn-close btn-close-white"
+                    data-bs-dismiss="modal">
+                </button>
+
+            </div>
+
+
+            {{-- BODY --}}
+
+            <div class="modal-body">
+
+
+                {{-- ========================================= --}}
+                {{-- CHOOSE METHOD --}}
+                {{-- ========================================= --}}
+
+                <div class="text-center mb-4">
+
+                    <h6 class="mb-3">
+                        Choose Verification Method
+                    </h6>
 
                     <button
                         type="button"
-                        class="btn-close btn-close-white"
-                        data-bs-dismiss="modal">
+                        class="btn btn-primary me-2"
+                        id="referenceButton">
+
+                        <i class="bi bi-search"></i>
+                        Search by Reference Number
+
+                    </button>
+
+
+                    <button
+                        type="button"
+                        class="btn btn-dark"
+                        id="scanButton">
+
+                        <i class="bi bi-qr-code-scan"></i>
+                        Scan QR Code
+
                     </button>
 
                 </div>
 
 
-                {{-- BODY --}}
-                <div class="modal-body">
+                {{-- ========================================= --}}
+                {{-- REFERENCE SEARCH --}}
+                {{-- ========================================= --}}
 
-                    {{-- SEARCH FORM --}}
+                <div
+                    id="referenceSection"
+                    style="display:none;">
+
                     <form id="searchVoucherForm">
 
                         @csrf
@@ -136,232 +178,278 @@
 
                     </form>
 
+                </div>
 
-                    {{-- LOADING --}}
-                    <div
-                        class="loading text-center mt-3"
-                        id="loading">
 
-                        <div
-                            class="spinner-border text-primary"
-                            role="status">
-                        </div>
+                {{-- ========================================= --}}
+                {{-- QR SCANNER --}}
+                {{-- ========================================= --}}
 
-                        <p class="mt-2">
-                            Searching voucher...
+                <div
+                    id="scannerSection"
+                    style="display:none;">
+
+                    <div class="text-center">
+
+                        <h6>
+                            Scan Voucher QR Code
+                        </h6>
+
+                        <p class="text-muted">
+                            Point the camera at the voucher QR Code.
                         </p>
 
                     </div>
 
 
-                    {{-- ERROR MESSAGE --}}
                     <div
-                        id="searchError"
+                        id="qr-reader"
+                        style="width:100%; max-width:500px; margin:auto;">
+                    </div>
+
+
+                    <div
+                        id="scanError"
                         class="alert alert-danger mt-3"
                         style="display:none;">
                     </div>
 
+                </div>
 
-                    {{-- ============================= --}}
-                    {{-- VOUCHER DETAILS --}}
-                    {{-- ============================= --}}
+
+                {{-- ========================================= --}}
+                {{-- LOADING --}}
+                {{-- ========================================= --}}
+
+                <div
+                    id="loading"
+                    class="text-center mt-3"
+                    style="display:none;">
 
                     <div
-                        id="voucherResult"
-                        class="voucher-result mt-4">
+                        class="spinner-border text-primary">
+                    </div>
 
-                        <div class="card shadow">
+                    <p class="mt-2">
+                        Searching voucher...
+                    </p>
 
-                            <div class="card-header bg-primary text-white">
-
-                                <h4 class="mb-0">
-                                    Voucher Details
-                                </h4>
-
-                            </div>
+                </div>
 
 
-                            <div class="card-body">
+                {{-- ========================================= --}}
+                {{-- ERROR --}}
+                {{-- ========================================= --}}
 
-                                {{-- CUSTOMER + ORGANIZATION --}}
-                                <div class="row mb-3">
-
-                                    <div class="col-md-6">
-
-                                        <strong>
-                                            Customer / Driver:
-                                        </strong>
-
-                                        <br>
-
-                                        <span id="driverName">
-                                            -
-                                        </span>
-
-                                    </div>
+                <div
+                    id="searchError"
+                    class="alert alert-danger mt-3"
+                    style="display:none;">
+                </div>
 
 
-                                    <div class="col-md-6">
+                {{-- ========================================= --}}
+                {{-- VOUCHER RESULT --}}
+                {{-- ========================================= --}}
 
-                                        <strong>
-                                            Organization:
-                                        </strong>
+                <div
+                    id="voucherResult"
+                    class="mt-4"
+                    style="display:none;">
 
-                                        <br>
+                    <div class="card shadow">
 
-                                        <span id="organizationName">
-                                            -
-                                        </span>
+                        <div
+                            class="card-header bg-primary text-white">
 
-                                    </div>
+                            <h4 class="mb-0">
+                                Voucher Details
+                            </h4>
 
-                                </div>
-
-
-                                {{-- VOUCHER CODE + AMOUNT --}}
-                                <div class="row mb-3">
-
-                                    <div class="col-md-6">
-
-                                        <strong>
-                                            Voucher Code:
-                                        </strong>
-
-                                        <br>
-
-                                        <span id="voucherCode">
-                                            -
-                                        </span>
-
-                                    </div>
+                        </div>
 
 
-                                    <div class="col-md-6">
-
-                                        <strong>
-                                            Amount:
-                                        </strong>
-
-                                        <br>
-
-                                        <span id="voucherAmount">
-                                            -
-                                        </span>
-
-                                        TZS
-
-                                    </div>
-
-                                </div>
+                        <div class="card-body">
 
 
-                                {{-- FUEL + REFERENCE --}}
-                                <div class="row mb-3">
+                            {{-- DRIVER + ORGANIZATION --}}
 
-                                    <div class="col-md-6">
+                            <div class="row mb-3">
 
-                                        <strong>
-                                            Fuel Litres:
-                                        </strong>
-
-                                        <br>
-
-                                        <span id="fuelLitres">
-                                            -
-                                        </span>
-
-                                        L
-
-                                    </div>
-
-
-                                    <div class="col-md-6">
-
-                                        <strong>
-                                            Reference Number:
-                                        </strong>
-
-                                        <br>
-
-                                        <span id="voucherReference">
-                                            -
-                                        </span>
-
-                                    </div>
-
-                                </div>
-
-
-                                {{-- STATUS --}}
-                                <div class="mb-3">
+                                <div class="col-md-6">
 
                                     <strong>
-                                        Status:
+                                        Customer / Driver:
                                     </strong>
 
                                     <br>
 
-                                    <span
-                                        id="voucherStatus"
-                                        class="badge bg-warning">
-
-                                        PENDING
-
+                                    <span id="driverName">
+                                        -
                                     </span>
 
                                 </div>
 
 
-                                {{-- QR CODE --}}
-                                <div class="text-center mt-4">
+                                <div class="col-md-6">
 
                                     <strong>
-                                        Voucher QR Code
+                                        Organization:
                                     </strong>
 
-                                    <div
-                                        id="voucherQrCode"
-                                        class="mt-2">
-                                    </div>
+                                    <br>
+
+                                    <span id="organizationName">
+                                        -
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+
+                            {{-- VOUCHER CODE + AMOUNT --}}
+
+                            <div class="row mb-3">
+
+                                <div class="col-md-6">
+
+                                    <strong>
+                                        Voucher Code:
+                                    </strong>
+
+                                    <br>
+
+                                    <span id="voucherCode">
+                                        -
+                                    </span>
 
                                 </div>
 
 
-                                {{-- HIDDEN REFERENCE --}}
-                                <input
-                                    type="hidden"
-                                    id="verifyReference"
-                                    name="reference_number">
+                                <div class="col-md-6">
+
+                                    <strong>
+                                        Amount:
+                                    </strong>
+
+                                    <br>
+
+                                    <span id="voucherAmount">
+                                        -
+                                    </span>
+
+                                    TZS
+
+                                </div>
+
+                            </div>
 
 
-                                {{-- VERIFY BUTTON --}}
+                            {{-- FUEL + REFERENCE --}}
+
+                            <div class="row mb-3">
+
+                                <div class="col-md-6">
+
+                                    <strong>
+                                        Fuel Litres:
+                                    </strong>
+
+                                    <br>
+
+                                    <span id="fuelLitres">
+                                        -
+                                    </span>
+
+                                    L
+
+                                </div>
+
+
+                                <div class="col-md-6">
+
+                                    <strong>
+                                        Reference Number:
+                                    </strong>
+
+                                    <br>
+
+                                    <span id="voucherReference">
+                                        -
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+
+                            {{-- STATUS --}}
+
+                            <div class="mb-3">
+
+                                <strong>
+                                    Status:
+                                </strong>
+
+                                <br>
+
+                                <span
+                                    id="voucherStatus"
+                                    class="badge bg-warning">
+
+                                    PENDING
+
+                                </span>
+
+                            </div>
+
+
+                            {{-- QR CODE --}}
+
+                            <div class="text-center mt-4">
+
+                                <strong>
+                                    Voucher QR Code
+                                </strong>
+
                                 <div
-                                    class="text-center mt-4">
-
-                                    <form
-                                        action="{{ route('voucher.verify') }}"
-                                        method="POST">
-
-                                        @csrf
-
-                                        <input
-                                            type="hidden"
-                                            name="reference_number"
-                                            id="confirmReference">
-
-                                        <button
-                                            type="submit"
-                                            class="btn btn-success btn-lg">
-
-                                            <i class="bi bi-check-circle"></i>
-
-                                            Confirm & Verify Voucher
-
-                                        </button>
-
-                                    </form>
-
+                                    id="voucherQrCode"
+                                    class="mt-2">
                                 </div>
+
+                            </div>
+
+
+                            {{-- ================================= --}}
+                            {{-- CONFIRM VERIFY --}}
+                            {{-- ================================= --}}
+
+                            <div
+                                class="text-center mt-4">
+
+                                <form
+                                    action="{{ route('voucher.verify') }}"
+                                    method="POST">
+
+                                    @csrf
+
+                                    <input
+                                        type="hidden"
+                                        name="reference_number"
+                                        id="confirmReference">
+
+                                    <button
+                                        type="submit"
+                                        class="btn btn-success btn-lg">
+
+                                        <i class="bi bi-check-circle"></i>
+
+                                        Confirm & Verify Voucher
+
+                                    </button>
+
+                                </form>
 
                             </div>
 
@@ -371,26 +459,29 @@
 
                 </div>
 
+            </div>
 
-                {{-- FOOTER --}}
-                <div class="modal-footer">
 
-                    <button
-                        type="button"
-                        class="btn btn-secondary"
-                        data-bs-dismiss="modal">
+            {{-- FOOTER --}}
 
-                        Close
+            <div class="modal-footer">
 
-                    </button>
+                <button
+                    type="button"
+                    class="btn btn-secondary"
+                    data-bs-dismiss="modal">
 
-                </div>
+                    Close
+
+                </button>
 
             </div>
 
         </div>
 
     </div>
+
+</div>
 
 
     {{-- ============================= --}}
@@ -589,55 +680,227 @@
 {{-- ============================= --}}
 {{-- JAVASCRIPT --}}
 {{-- ============================= --}}
-
+<script src="https://unpkg.com/html5-qrcode"></script>
 <script>
 
+let qrScanner = null;
+
+
+/* ==========================================================
+   CHOOSE SEARCH BY REFERENCE NUMBER
+   ========================================================== */
+
 document
-    .getElementById('searchVoucherForm')
-    .addEventListener('submit', function(e) {
+    .getElementById('referenceButton')
+    .addEventListener('click', function () {
 
-        e.preventDefault();
+        document.getElementById('referenceSection').style.display = 'block';
 
-        let referenceNumber =
-            document.getElementById('reference_number').value;
+        document.getElementById('scannerSection').style.display = 'none';
 
-        let loading =
-            document.getElementById('loading');
+        document.getElementById('scanError').style.display = 'none';
 
-        let error =
-            document.getElementById('searchError');
+        stopScanner();
 
-        let result =
-            document.getElementById('voucherResult');
+    });
 
 
-        // Hide old messages
-        error.style.display = 'none';
+/* ==========================================================
+   CHOOSE SCAN QR CODE
+   ========================================================== */
 
-        result.style.display = 'none';
+document
+    .getElementById('scanButton')
+    .addEventListener('click', function () {
 
-        // Show loading
-        loading.style.display = 'block';
+        document.getElementById('referenceSection').style.display = 'none';
+
+        document.getElementById('scannerSection').style.display = 'block';
+
+        document.getElementById('searchError').style.display = 'none';
+
+        startScanner();
+
+    });
 
 
-        fetch("{{ route('voucher.search') }}", {
+/* ==========================================================
+   START QR SCANNER
+   ========================================================== */
+
+function startScanner() {
+
+    if (qrScanner !== null) {
+        return;
+    }
+
+    qrScanner = new Html5Qrcode("qr-reader");
+
+
+    const config = {
+        fps: 10,
+
+        qrbox: {
+            width: 250,
+            height: 250
+        }
+    };
+
+
+    qrScanner.start(
+
+        {
+            facingMode: "environment"
+        },
+
+        config,
+
+
+        function (decodedText, decodedResult) {
+
+            console.log(
+                "Scanned Reference Number:",
+                decodedText
+            );
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | QR CODE IMESOMA REFERENCE NUMBER
+            |--------------------------------------------------------------------------
+            */
+
+            searchVoucher(decodedText);
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | STOP CAMERA AFTER SUCCESSFUL SCAN
+            |--------------------------------------------------------------------------
+            */
+
+            stopScanner();
+
+        },
+
+
+        function (errorMessage) {
+
+            // Continuous scanning errors are ignored
+
+        }
+
+    )
+    .catch(function (error) {
+
+        console.log(error);
+
+
+        let scanError =
+            document.getElementById('scanError');
+
+
+        scanError.innerHTML =
+            "Unable to access camera. Please allow camera permission.";
+
+
+        scanError.style.display =
+            'block';
+
+    });
+
+}
+
+
+/* ==========================================================
+   STOP QR SCANNER
+   ========================================================== */
+
+function stopScanner() {
+
+    if (qrScanner !== null) {
+
+        qrScanner
+            .stop()
+            .then(function () {
+
+                qrScanner.clear();
+
+                qrScanner = null;
+
+            })
+            .catch(function () {
+
+                qrScanner = null;
+
+            });
+
+    }
+
+}
+
+
+/* ==========================================================
+   SEARCH VOUCHER
+   THIS FUNCTION IS USED BY:
+   1. Reference Number Search
+   2. QR Code Scan
+   ========================================================== */
+
+function searchVoucher(referenceNumber) {
+
+    let loading =
+        document.getElementById('loading');
+
+
+    let error =
+        document.getElementById('searchError');
+
+
+    let result =
+        document.getElementById('voucherResult');
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | CLEAN OLD DATA
+    |--------------------------------------------------------------------------
+    */
+
+    error.style.display = 'none';
+
+    result.style.display = 'none';
+
+    loading.style.display = 'block';
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | SEND REQUEST TO LARAVEL
+    |--------------------------------------------------------------------------
+    */
+
+    fetch(
+        "{{ route('voucher.search') }}",
+        {
 
             method: "POST",
 
             headers: {
 
-                "Content-Type":
-                    "application/json",
+                "Content-Type": "application/json",
 
                 "X-CSRF-TOKEN":
                     document
-                        .querySelector('input[name="_token"]')
+                        .querySelector(
+                            '#searchVoucherForm input[name="_token"]'
+                        )
                         .value,
 
-                "Accept":
-                    "application/json"
+                "Accept": "application/json"
 
             },
+
 
             body: JSON.stringify({
 
@@ -646,165 +909,404 @@ document
 
             })
 
-        })
-
-        .then(response => {
-
-            return response.json()
-                .then(data => ({
-
-                    status: response.status,
-
-                    data: data
-
-                }));
-
-        })
-
-        .then(resultData => {
-
-            loading.style.display = 'none';
+        }
+    )
 
 
-            if (!resultData.data.success) {
+    /*
+    |--------------------------------------------------------------------------
+    | GET RESPONSE
+    |--------------------------------------------------------------------------
+    */
+
+    .then(function (response) {
+
+        return response.json();
+
+    })
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | PROCESS RESPONSE
+    |--------------------------------------------------------------------------
+    */
+
+    .then(function (data) {
+
+        loading.style.display = 'none';
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | IF VOUCHER NOT FOUND OR ALREADY USED
+        |--------------------------------------------------------------------------
+        */
+
+        if (!data.success) {
+
+            error.innerHTML =
+                data.message;
+
+            error.style.display =
+                'block';
+
+            return;
+
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | GET VOUCHER DATA
+        |--------------------------------------------------------------------------
+        */
+
+        let voucher =
+            data.voucher;
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | DRIVER
+        |--------------------------------------------------------------------------
+        */
+
+        document.getElementById(
+            'driverName'
+        ).innerText =
+            voucher.driver;
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | ORGANIZATION
+        |--------------------------------------------------------------------------
+        */
+
+        document.getElementById(
+            'organizationName'
+        ).innerText =
+            voucher.organization;
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | VOUCHER CODE
+        |--------------------------------------------------------------------------
+        */
+
+        document.getElementById(
+            'voucherCode'
+        ).innerText =
+            voucher.voucher_code;
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | AMOUNT
+        |--------------------------------------------------------------------------
+        */
+
+        document.getElementById(
+            'voucherAmount'
+        ).innerText =
+            voucher.amount;
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | FUEL LITRES
+        |--------------------------------------------------------------------------
+        */
+
+        document.getElementById(
+            'fuelLitres'
+        ).innerText =
+            voucher.fuel_litres;
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | REFERENCE NUMBER
+        |--------------------------------------------------------------------------
+        */
+
+        document.getElementById(
+            'voucherReference'
+        ).innerText =
+            voucher.reference_number;
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | HIDDEN REFERENCE FOR VERIFY
+        |--------------------------------------------------------------------------
+        */
+
+        document.getElementById(
+            'confirmReference'
+        ).value =
+            voucher.reference_number;
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | STATUS
+        |--------------------------------------------------------------------------
+        */
+
+        let status =
+            document.getElementById(
+                'voucherStatus'
+            );
+
+
+        status.innerText =
+            voucher.status;
+
+
+        if (
+            voucher.status.toLowerCase()
+            === 'pending'
+        ) {
+
+            status.className =
+                'badge bg-warning';
+
+        }
+        else {
+
+            status.className =
+                'badge bg-success';
+
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | DISPLAY QR CODE
+        |--------------------------------------------------------------------------
+        */
+
+        document.getElementById(
+            'voucherQrCode'
+        ).innerHTML =
+            voucher.qr_code;
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | SHOW VOUCHER RESULT
+        |--------------------------------------------------------------------------
+        */
+
+        result.style.display =
+            'block';
+
+    })
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | ERROR
+    |--------------------------------------------------------------------------
+    */
+
+    .catch(function (errorData) {
+
+        loading.style.display =
+            'none';
+
+
+        console.log(errorData);
+
+
+        error.innerHTML =
+            'Something went wrong. Please try again.';
+
+
+        error.style.display =
+            'block';
+
+    });
+
+}
+
+
+/* ==========================================================
+   SEARCH FORM
+   SEARCH BY REFERENCE NUMBER
+   ========================================================== */
+
+document
+    .getElementById('searchVoucherForm')
+    .addEventListener(
+        'submit',
+        function (e) {
+
+            e.preventDefault();
+
+
+            let referenceNumber =
+                document
+                    .getElementById(
+                        'reference_number'
+                    )
+                    .value
+                    .trim();
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | CHECK EMPTY
+            |--------------------------------------------------------------------------
+            */
+
+            if (referenceNumber === '') {
+
+                let error =
+                    document.getElementById(
+                        'searchError'
+                    );
+
 
                 error.innerHTML =
-                    resultData.data.message;
+                    'Please enter reference number.';
 
-                error.style.display = 'block';
+
+                error.style.display =
+                    'block';
+
 
                 return;
 
             }
 
 
-            let voucher =
-                resultData.data.voucher;
+            /*
+            |--------------------------------------------------------------------------
+            | SEARCH
+            |--------------------------------------------------------------------------
+            */
+
+            searchVoucher(
+                referenceNumber
+            );
+
+        }
+    );
 
 
-            // ==========================
-            // DISPLAY VOUCHER DETAILS
-            // ==========================
-
-            document.getElementById(
-                'driverName'
-            ).innerText =
-                voucher.driver;
-
-
-            document.getElementById(
-                'organizationName'
-            ).innerText =
-                voucher.organization;
-
-
-            document.getElementById(
-                'voucherCode'
-            ).innerText =
-                voucher.voucher_code;
-
-
-            document.getElementById(
-                'voucherAmount'
-            ).innerText =
-                voucher.amount;
-
-
-            document.getElementById(
-                'fuelLitres'
-            ).innerText =
-                voucher.fuel_litres;
-
-
-            document.getElementById(
-                'voucherReference'
-            ).innerText =
-                voucher.reference_number;
-
-
-            document.getElementById(
-                'confirmReference'
-            ).value =
-                voucher.reference_number;
-
-
-            // ==========================
-            // STATUS
-            // ==========================
-
-            let status =
-                document.getElementById(
-                    'voucherStatus'
-                );
-
-            status.innerText =
-                voucher.status;
-
-
-            status.className =
-                'badge bg-warning';
-
-
-            // ==========================
-            // QR CODE
-            // ==========================
-
-            document.getElementById(
-                'voucherQrCode'
-            ).innerHTML =
-                voucher.qr_code;
-
-
-            // Show result
-            result.style.display =
-                'block';
-
-        })
-
-        .catch(errorData => {
-
-            loading.style.display = 'none';
-
-            error.innerHTML =
-                'Something went wrong. Please try again.';
-
-            error.style.display =
-                'block';
-
-            console.log(errorData);
-
-        });
-
-    });
-
-
-/*
-|--------------------------------------------------------------------------
-| CLEAR MODAL WHEN CLOSED
-|--------------------------------------------------------------------------
-*/
+/* ==========================================================
+   CLEAR MODAL WHEN CLOSED
+   ========================================================== */
 
 document
     .getElementById('verifyModal')
     .addEventListener(
         'hidden.bs.modal',
-        function() {
+        function () {
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | STOP CAMERA
+            |--------------------------------------------------------------------------
+            */
+
+            stopScanner();
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | CLEAR REFERENCE NUMBER
+            |--------------------------------------------------------------------------
+            */
 
             document
-                .getElementById('reference_number')
+                .getElementById(
+                    'reference_number'
+                )
                 .value = '';
 
-            document
-                .getElementById('voucherResult')
-                .style.display = 'none';
+
+            /*
+            |--------------------------------------------------------------------------
+            | HIDE RESULT
+            |--------------------------------------------------------------------------
+            */
 
             document
-                .getElementById('searchError')
-                .style.display = 'none';
+                .getElementById(
+                    'voucherResult'
+                )
+                .style.display =
+                'none';
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | HIDE ERRORS
+            |--------------------------------------------------------------------------
+            */
 
             document
-                .getElementById('loading')
-                .style.display = 'none';
+                .getElementById(
+                    'searchError'
+                )
+                .style.display =
+                'none';
+
+
+            document
+                .getElementById(
+                    'scanError'
+                )
+                .style.display =
+                'none';
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | HIDE LOADING
+            |--------------------------------------------------------------------------
+            */
+
+            document
+                .getElementById(
+                    'loading'
+                )
+                .style.display =
+                'none';
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | HIDE SEARCH SECTION
+            |--------------------------------------------------------------------------
+            */
+
+            document
+                .getElementById(
+                    'referenceSection'
+                )
+                .style.display =
+                'none';
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | HIDE SCANNER
+            |--------------------------------------------------------------------------
+            */
+
+            document
+                .getElementById(
+                    'scannerSection'
+                )
+                .style.display =
+                'none';
 
         }
     );
