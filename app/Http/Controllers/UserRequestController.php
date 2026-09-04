@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Gapco;
 use App\Models\Notification;
 use App\Models\SystemUser;
+use App\Models\Station;
 use App\Models\UserRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -140,53 +141,116 @@ Thank you.",
     return back()->with('success', 'Status updated successfully');
 }
 
-   public function fuelReport(Request $request)
+
+public function fuelReport(Request $request)
 {
+    // ============================================================
+    // USER ALIYE-LOGIN
+    // ============================================================
     $user = Auth::guard('web')->user();
 
-    $query = VoucherAssignment::query();
+    // ============================================================
+    // DATES
+    // ============================================================
+    $startDate = $request->start_date;
+    $endDate   = $request->end_date;
 
-    // Load relationships
-    $query->with([
-        'voucher',
-        'driver'
-    ]);
 
-    // Filter kwa kampuni (kama si admin)
-    if ($user->role != 'admin') {
+    // ============================================================
+    // QUERY YA STATIONS
+    // ============================================================
+    $query = Station::with('organization');
 
-        $query->whereHas('driver', function ($q) use ($user) {
 
-            $q->where('organization_id', $user->organization_id);
+    // ============================================================
+    // USER ACCESS
+    // ============================================================
 
-        });
+    // ADMIN
+    // Anaona stations zote
+    if ($user->role == 'admin') {
 
+        // Hakuna filter
     }
 
-    // Filter kwa tarehe
-    if ($request->filled('start_date') && $request->filled('end_date')) {
+    // STATION MANAGER
+    // Anaona stations zote za organization yake
+    elseif ($user->role == 'station_manager') {
 
-        $query->whereBetween('created_at', [
-            $request->start_date . ' 00:00:00',
-            $request->end_date . ' 23:59:59'
-        ]);
-
+        $query->where(
+            'organization_id',
+            $user->organization_id
+        );
     }
 
-    $assignments = $query->orderBy('created_at', 'desc')->get();
+    // USERS WENGINE
+    // Anaona stations za organization yake
+    else {
 
-    $totalAmount = $assignments->sum(function ($assignment) {
+        $query->where(
+            'organization_id',
+            $user->organization_id
+        );
+    }
 
-        return $assignment->voucher->amount ?? 0;
 
-    });
+    // ============================================================
+    // DATE FILTER
+    // ============================================================
 
-    $totalLiters = $totalAmount / 3000;
+    if ($startDate && $endDate) {
+
+        $query->whereDate(
+            'created_at',
+            '>=',
+            $startDate
+        )->whereDate(
+            'created_at',
+            '<=',
+            $endDate
+        );
+
+    } elseif ($startDate) {
+
+        $query->whereDate(
+            'created_at',
+            '>=',
+            $startDate
+        );
+
+    } elseif ($endDate) {
+
+        $query->whereDate(
+            'created_at',
+            '<=',
+            $endDate
+        );
+    }
+
+
+    // ============================================================
+    // GET STATIONS
+    // ============================================================
+
+    $stations = $query
+        ->orderBy('created_at', 'desc')
+        ->get();
 
     return view('report2', compact(
-        'assignments',
-        'totalAmount',
-        'totalLiters'
+        'stations',
+        'startDate',
+        'endDate'
     ));
 }
+
+
+
+
+
+
+
+
+
+
+
 }

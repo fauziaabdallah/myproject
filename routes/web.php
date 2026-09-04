@@ -14,7 +14,9 @@ use Illuminate\Support\Facades\Route;
 
 Route::get("/",[LoginController::class,"showLogin"])->name('login1');
 Route::post("/login",[LoginController::class,"login"])->name("login");
+
 Route::get("/dashboard",[AdminController::class,"dashboard"])->name("dashboard");
+
 Route::resource('stations', StationController::class);
 Route::resource('fuelManagers', FuelManagerController::class);
 Route::resource('gapcos', GapcoController::class);
